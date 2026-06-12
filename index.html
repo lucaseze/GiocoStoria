@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trolley School</title>
+<style>
+  :root {
+    --bg: #1a1a2e;
+    --card-bg: #f7f5f0;
+    --card-inner: #ffffff;
+    --accent: #4a6fa5;
+    --accent-light: #e8eef7;
+    --text-main: #2b2b2b;
+    --text-secondary: #6b6b6b;
+    --text-tertiary: #999;
+    --border: #e0ddd5;
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+  .wrapper {
+    width: 100%;
+    max-width: 400px;
+  }
+  .card-outer {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+  }
+  .card-inner {
+    background: var(--card-inner);
+    border-radius: calc(var(--radius) - 4px);
+    border: 0.5px solid var(--border);
+    padding: 1.25rem;
+  }
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+  .streak { color: var(--accent); font-weight: 600; }
+  .guide-text {
+    font-size: 13px;
+    color: var(--accent);
+    font-style: italic;
+    margin-bottom: 0.75rem;
+    line-height: 1.5;
+  }
+  .dilemma-text {
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0 0 1rem;
+  }
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 0.75rem;
+  }
+  button.option-btn {
+    padding: 12px;
+    font-size: 14px;
+    border: 1px solid var(--border);
+    background: var(--accent-light);
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s;
+    color: var(--text-main);
+  }
+  button.option-btn:hover { background: #d9e4f5; }
+  button.option-btn:active { transform: scale(0.99); }
+
+  .comment-box {
+    background: var(--accent-light);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 1rem;
+    font-size: 13px;
+    color: var(--accent);
+    line-height: 1.5;
+  }
+
+  .profile-section { border-top: 0.5px solid var(--border); padding-top: 1rem; margin-bottom: 1rem; }
+  .profile-label { font-size: 12px; color: var(--text-secondary); margin: 0 0 10px; }
+  .axis { margin-bottom: 12px; }
+  .axis-labels { display:flex; justify-content: space-between; font-size: 11px; color: var(--text-tertiary); margin-bottom: 4px; }
+  .axis-bar { height: 8px; background: var(--accent-light); border-radius: 99px; position: relative; }
+  .axis-tick { position:absolute; left:50%; top:50%; transform: translate(-50%,-50%); width:1px; height:14px; background: var(--border); }
+  .axis-dot { position:absolute; top:-3px; width:14px; height:14px; border-radius:50%; background: var(--accent); transform: translateX(-50%); transition: left 0.3s; }
+
+  .archetype-box {
+    background: var(--accent-light);
+    border-radius: 10px;
+    padding: 10px 12px;
+    text-align: center;
+  }
+  .archetype-title { margin:0; font-size: 13px; font-weight: 600; color: var(--accent); }
+  .archetype-sub { margin: 4px 0 0; font-size: 11px; color: var(--text-tertiary); }
+
+  .footer-row {
+    border-top: 0.5px solid var(--border);
+    padding-top: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .serial-label { margin:0; font-size: 11px; color: var(--text-tertiary); }
+  .serial-code { margin:0; font-size: 13px; font-weight: 600; font-family: 'SF Mono', Consolas, monospace; word-break: break-all; }
+  button.small-btn {
+    padding: 8px 12px;
+    font-size: 12px;
+    border: 1px solid var(--border);
+    background: var(--card-inner);
+    border-radius: 8px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .restore-section {
+    margin-top: 1rem;
+    text-align: center;
+  }
+  .restore-section input {
+    width: 100%;
+    padding: 8px;
+    font-size: 13px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 6px;
+    font-family: monospace;
+    box-sizing: border-box;
+  }
+  .restore-section button {
+    width: 100%;
+    padding: 10px;
+    font-size: 13px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--accent-light);
+    cursor: pointer;
+  }
+  .link-btn {
+    background: none;
+    border: none;
+    color: var(--text-tertiary);
+    font-size: 12px;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 4px;
+    margin-top: 8px;
+  }
+
+  .final-card {
+    text-align: center;
+  }
+  .final-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 0.5rem 0;
+  }
+  .final-text {
+    font-size: 14px;
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+
+  /* Replay overlay */
+  .replay-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100;
+  }
+  .replay-box {
+    background: var(--card-inner);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    max-width: 340px;
+    width: 90%;
+    text-align: center;
+  }
+  .replay-box .day-num { font-size: 12px; color: var(--text-tertiary); }
+  .replay-box .text { font-size: 14px; line-height: 1.6; margin: 0.75rem 0; }
+  .replay-box .choice { font-size: 13px; color: var(--accent); font-weight: 600; }
+  .replay-box .progress { height:4px; background: var(--accent-light); border-radius:99px; margin-top:1rem; overflow:hidden; }
+  .replay-box .progress-fill { height:100%; background: var(--accent); transition: width 0.3s; }
+  .replay-close {
+    margin-top: 1rem;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--accent-light);
+    cursor: pointer;
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="card-outer">
+    <div class="card-inner" id="gameCard">
+      <!-- popolato via JS -->
+    </div>
+  </div>
+
+  <div class="restore-section" id="restoreSection">
+    <button class="link-btn" id="toggleRestore">Hai un seriale? Inseriscilo per ripristinare il tuo percorso</button>
+    <div id="restoreForm" style="display:none; margin-top:8px;">
+      <input type="text" id="serialInput" placeholder="TS-XXXX-XXXXX">
+      <button id="restoreBtn">Ripristina percorso</button>
+    </div>
+  </div>
+</div>
+
+<!-- script: ordine importante, engine.js usa i dati definiti negli altri file -->
+<script src="data_act1.js"></script>
+<script src="data_act2_lyra_q1.js"></script>
+<script src="data_act2_lyra_q2.js"></script>
+<script src="data_act2_lyra_q3.js"></script>
+<script src="data_act2_lyra_q4.js"></script>
+<script src="data_act2_borin_q1.js"></script>
+<script src="data_act2_borin_q2.js"></script>
+<script src="data_act2_borin_q3.js"></script>
+<script src="data_act2_borin_q4.js"></script>
+<script src="data_act3_pilastro.js"></script>
+<script src="data_act3_equilibrio.js"></script>
+<script src="data_act3_burattinaio.js"></script>
+<script src="data_act3_mediatore.js"></script>
+<script src="data_act3_eremita.js"></script>
+<script src="data_act3_risveglio.js"></script>
+<script src="data_act3_vincitore.js"></script>
+<script src="data_act3_seconda.js"></script>
+<script src="data_act3_veroamico.js"></script>
+<script src="data_act3_eroepersbaglio.js"></script>
+<script src="data_act3_resadeiconti.js"></script>
+<script src="data_act3_fuorileggegentile.js"></script>
+<script src="data_act3_stradadiritta.js"></script>
+<script src="data_act3_compromesso.js"></script>
+<script src="data_act3_duelupi.js"></script>
+<script src="data_act3_specchio.js"></script>
+<script src="engine.js"></script>
+<script src="ui.js"></script>
+</body>
+</html>
