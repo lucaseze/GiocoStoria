@@ -3,18 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trolley School</title>
+<title>GiocoStoria</title>
 <style>
   :root {
     --bg: #1a1a2e;
     --card-bg: #f7f5f0;
     --card-inner: #ffffff;
-    --accent: #4a6fa5;
+    --accent: #3a5a8c;
     --accent-light: #e8eef7;
-    --text-main: #2b2b2b;
-    --text-secondary: #6b6b6b;
-    --text-tertiary: #999;
-    --border: #e0ddd5;
+    --text-main: #1a1a1a;
+    --text-secondary: #5a5a5a;
+    --text-tertiary: #777;
+    --border: #d8d4c8;
     --radius: 16px;
   }
   * { box-sizing: border-box; }
@@ -48,21 +48,24 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
-    font-size: 13px;
+    font-size: 14px;
     color: var(--text-secondary);
+    font-weight: 500;
   }
-  .streak { color: var(--accent); font-weight: 600; }
+  .streak { color: var(--accent); font-weight: 700; }
   .guide-text {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--accent);
     font-style: italic;
     margin-bottom: 0.75rem;
-    line-height: 1.5;
+    line-height: 1.6;
+    font-weight: 500;
   }
   .dilemma-text {
-    font-size: 15px;
-    line-height: 1.6;
+    font-size: 16px;
+    line-height: 1.7;
     margin: 0 0 1rem;
+    color: var(--text-main);
   }
   .options {
     display: flex;
@@ -71,8 +74,8 @@
     margin-bottom: 0.75rem;
   }
   button.option-btn {
-    padding: 12px;
-    font-size: 14px;
+    padding: 13px;
+    font-size: 15px;
     border: 1px solid var(--border);
     background: var(--accent-light);
     border-radius: 10px;
@@ -80,6 +83,8 @@
     text-align: left;
     transition: background 0.15s;
     color: var(--text-main);
+    font-weight: 500;
+    line-height: 1.5;
   }
   button.option-btn:hover { background: #d9e4f5; }
   button.option-btn:active { transform: scale(0.99); }
@@ -89,9 +94,10 @@
     border-radius: 10px;
     padding: 10px 12px;
     margin-bottom: 1rem;
-    font-size: 13px;
+    font-size: 14px;
     color: var(--accent);
-    line-height: 1.5;
+    line-height: 1.6;
+    font-weight: 500;
   }
 
   .profile-section { border-top: 0.5px solid var(--border); padding-top: 1rem; margin-bottom: 1rem; }
@@ -194,9 +200,9 @@
     width: 90%;
     text-align: center;
   }
-  .replay-box .day-num { font-size: 12px; color: var(--text-tertiary); }
-  .replay-box .text { font-size: 14px; line-height: 1.6; margin: 0.75rem 0; }
-  .replay-box .choice { font-size: 13px; color: var(--accent); font-weight: 600; }
+  .replay-box .day-num { font-size: 13px; color: var(--text-secondary); font-weight: 600; }
+  .replay-box .text { font-size: 15px; line-height: 1.7; margin: 0.75rem 0; color: var(--text-main); }
+  .replay-box .choice { font-size: 14px; color: var(--accent); font-weight: 700; }
   .replay-box .progress { height:4px; background: var(--accent-light); border-radius:99px; margin-top:1rem; overflow:hidden; }
   .replay-box .progress-fill { height:100%; background: var(--accent); transition: width 0.3s; }
   .replay-close {
@@ -208,6 +214,103 @@
     cursor: pointer;
     font-size: 13px;
   }
+  .replay-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    gap: 8px;
+  }
+  .replay-arrow {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--accent-light);
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .replay-arrow:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+  .replay-arrow:active:not(:disabled) { transform: scale(0.95); }
+
+  /* Intro card */
+  .intro-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 0 0 0.75rem;
+    text-align: center;
+  }
+  .intro-text {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text-main);
+    margin-bottom: 0.75rem;
+  }
+  .intro-list {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-main);
+    margin: 0 0 1rem;
+    padding-left: 1.2rem;
+  }
+  .intro-list li { margin-bottom: 4px; }
+
+  .name-input-row {
+    margin-bottom: 1rem;
+  }
+  .name-input-row label {
+    display: block;
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .name-input-row input {
+    width: 100%;
+    padding: 12px;
+    font-size: 15px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-sizing: border-box;
+    font-family: inherit;
+  }
+
+  button.primary-btn {
+    width: 100%;
+    padding: 13px;
+    font-size: 15px;
+    font-weight: 700;
+    border: none;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+  button.primary-btn:active { opacity: 0.9; }
+
+  /* Copia seriale */
+  .serial-code-wrap {
+    cursor: pointer;
+    position: relative;
+  }
+  .copy-feedback {
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 700;
+    margin: 2px 0 0;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .copy-feedback.show { opacity: 1; }
 </style>
 </head>
 <body>

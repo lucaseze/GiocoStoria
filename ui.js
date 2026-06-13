@@ -10,8 +10,44 @@ function clampAxis(val, range) {
   return Math.max(0, Math.min(100, pct));
 }
 
+// ============================================================
+// INTRO
+// ============================================================
+function renderIntro(root) {
+  const html = `
+    <p class="intro-title">GiocoStoria</p>
+    <p class="intro-text">Benvenuto in un percorso narrativo di 30 giorni, fatto di dilemmi e scelte morali. Ogni scelta cambia chi diventi.</p>
+    <ul class="intro-list">
+      <li>Ogni giorno, leggi una breve situazione e scegli tra due opzioni.</li>
+      <li>Le tue scelte costruiscono un profilo su due assi: <strong>Coscienza/Calcolo</strong> e <strong>Egoismo/Altruismo</strong>.</li>
+      <li>Dal giorno 11, il percorso si dirama in base a chi sei diventato e a chi ti accompagna.</li>
+      <li>Al giorno 30 otterrai uno dei 12 finali possibili, con un "seriale" che riassume il tuo cammino.</li>
+      <li>Il progresso è salvato sul tuo dispositivo. Usa il seriale per ripristinarlo o condividerlo.</li>
+    </ul>
+    <div class="name-input-row">
+      <label for="playerNameInput">Come ti chiami (o come si chiama il tuo personaggio)?</label>
+      <input type="text" id="playerNameInput" placeholder="Es. Alex" value="${state.playerName || ''}" maxlength="30">
+    </div>
+    <button class="primary-btn" id="startBtn">Inizia il percorso</button>
+  `;
+  root.innerHTML = html;
+
+  document.getElementById('startBtn').addEventListener('click', () => {
+    const input = document.getElementById('playerNameInput');
+    state.playerName = input.value.trim();
+    state.introSeen = true;
+    saveState(state);
+    render();
+  });
+}
+
 function render() {
   const root = document.getElementById('gameCard');
+
+  if (!state.introSeen) {
+    renderIntro(root);
+    return;
+  }
 
   if (state.completed) {
     renderFinal(root);
@@ -39,8 +75,9 @@ function render() {
 
   let html = '';
 
+  const greeting = state.playerName ? `${state.playerName} &middot; ` : '';
   html += `<div class="header-row">
-    <span>Trolley School &middot; giorno ${state.day}</span>
+    <span>${greeting}GiocoStoria</span>
     <span class="streak">giorno ${state.day} / 30</span>
   </div>`;
 
@@ -89,9 +126,10 @@ function render() {
   if (state.history.length > 0) {
     const serial = generateSerial(state);
     html += `<div class="footer-row">
-      <div>
-        <p class="serial-label">Il tuo seriale</p>
+      <div class="serial-code-wrap" id="serialWrap" data-serial="${serial}">
+        <p class="serial-label">Il tuo seriale (tocca per copiare)</p>
         <p class="serial-code">${serial}</p>
+        <p class="copy-feedback" id="copyFeedback">Copiato!</p>
       </div>
       <button class="small-btn" id="replayBtn">Replay</button>
     </div>`;
@@ -111,6 +149,8 @@ function render() {
   if (replayBtn) {
     replayBtn.addEventListener('click', () => startReplay(state));
   }
+
+  bindSerialCopy();
 }
 
 // Etichetta profilo: nei giorni 1-10 usa l'archetipo Atto1; dopo, mostra companion + ramo
@@ -169,9 +209,10 @@ function renderFinal(root) {
   </div>`;
 
   html += `<div class="footer-row">
-    <div>
-      <p class="serial-label">Il tuo seriale completo</p>
+    <div class="serial-code-wrap" id="serialWrap" data-serial="${serial}">
+      <p class="serial-label">Il tuo seriale completo (tocca per copiare)</p>
       <p class="serial-code">${serial}</p>
+      <p class="copy-feedback" id="copyFeedback">Copiato!</p>
     </div>
     <button class="small-btn" id="replayBtn">Replay</button>
   </div>`;
@@ -183,6 +224,7 @@ function renderFinal(root) {
   root.innerHTML = html;
 
   document.getElementById('replayBtn').addEventListener('click', () => startReplay(state));
+  bindSerialCopy();
   document.getElementById('restartBtn').addEventListener('click', () => {
     if (confirm("Sei sicuro? Il percorso attuale andrà perso (salva il seriale prima, se vuoi tenerlo).")) {
       state = getInitialState();
@@ -193,47 +235,90 @@ function renderFinal(root) {
 }
 
 // ============================================================
+// COPIA SERIALE
+// ============================================================
+function bindSerialCopy() {
+  const wrap = document.getElementById('serialWrap');
+  if (!wrap) return;
+  wrap.addEventListener('click', () => {
+    const serial = wrap.dataset.serial;
+    const doFeedback = () => {
+      const fb = document.getElementById('copyFeedback');
+      if (fb) {
+        fb.classList.add('show');
+        setTimeout(() => fb.classList.remove('show'), 1500);
+      }
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(serial).then(doFeedback).catch(() => {
+        fallbackCopy(serial, doFeedback);
+      });
+    } else {
+      fallbackCopy(serial, doFeedback);
+    }
+  });
+}
+
+function fallbackCopy(text, cb) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); cb(); } catch(e) {}
+  document.body.removeChild(ta);
+}
+
+// ============================================================
 // REPLAY
 // ============================================================
 function startReplay(currentState) {
   const history = currentState.history;
   if (history.length === 0) return;
 
+  // pre-calcola, per ogni passo, il dilemma e l'opzione scelta (rigiocando dall'inizio)
+  const steps = [];
+  let replayState = getInitialState();
+  for (let i = 0; i < history.length; i++) {
+    const dilemma = getCurrentDilemma(replayState);
+    const h = history[i];
+    const option = dilemma.options.find(o => o.id === h.choiceId);
+    steps.push({ dilemma, option });
+    replayState = applyChoiceSilent(replayState, h.choiceId);
+  }
+
   const overlay = document.createElement('div');
   overlay.className = 'replay-overlay';
   document.body.appendChild(overlay);
 
   let i = 0;
-  let replayState = getInitialState();
 
-  function showStep() {
-    if (i >= history.length) {
-      overlay.remove();
-      return;
-    }
-    const dilemma = getCurrentDilemma(replayState);
-    const h = history[i];
-    const option = dilemma.options.find(o => o.id === h.choiceId);
-
-    const pct = ((i + 1) / history.length) * 100;
+  function show() {
+    const { dilemma, option } = steps[i];
+    const pct = ((i + 1) / steps.length) * 100;
 
     overlay.innerHTML = `<div class="replay-box">
-      <div class="day-num">Giorno ${dilemma.day}</div>
-      <div class="text">${dilemma.text.substring(0, 140)}${dilemma.text.length > 140 ? '...' : ''}</div>
+      <div class="day-num">Giorno ${dilemma.day} di ${steps.length}</div>
+      <div class="text">${dilemma.text.substring(0, 160)}${dilemma.text.length > 160 ? '...' : ''}</div>
       <div class="choice">→ ${option.label}</div>
+      ${option.comment ? `<div class="text" style="font-size:13px; color:var(--text-secondary);">${option.comment}</div>` : ''}
       <div class="progress"><div class="progress-fill" style="width:${pct}%"></div></div>
-      <button class="replay-close" id="closeReplay">Chiudi</button>
+      <div class="replay-nav">
+        <button class="replay-arrow" id="prevStep" ${i===0 ? 'disabled' : ''}>&larr;</button>
+        <button class="replay-close" id="closeReplay">Chiudi</button>
+        <button class="replay-arrow" id="nextStep" ${i===steps.length-1 ? 'disabled' : ''}>&rarr;</button>
+      </div>
     </div>`;
 
     document.getElementById('closeReplay').addEventListener('click', () => overlay.remove());
-
-    replayState = applyChoiceSilent(replayState, h.choiceId);
-    i++;
-
-    setTimeout(showStep, 1400);
+    const prevBtn = document.getElementById('prevStep');
+    const nextBtn = document.getElementById('nextStep');
+    if (prevBtn) prevBtn.addEventListener('click', () => { if (i>0) { i--; show(); } });
+    if (nextBtn) nextBtn.addEventListener('click', () => { if (i<steps.length-1) { i++; show(); } });
   }
 
-  showStep();
+  show();
 }
 
 // ============================================================

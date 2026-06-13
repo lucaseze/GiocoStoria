@@ -26,14 +26,14 @@ function getQuadrant(cosc, calc, ego, alt) {
 function getAct2Data(companion, quadrant) {
   const key = companion + "_q" + quadrant;
   const map = {
-    "lyra_1": ACT2_LYRA_Q1,
-    "lyra_2": ACT2_LYRA_Q2,
-    "lyra_3": ACT2_LYRA_Q3,
-    "lyra_4": ACT2_LYRA_Q4,
-    "borin_1": ACT2_BORIN_Q1,
-    "borin_2": ACT2_BORIN_Q2,
-    "borin_3": ACT2_BORIN_Q3,
-    "borin_4": ACT2_BORIN_Q4
+    "lyra_q1": ACT2_LYRA_Q1,
+    "lyra_q2": ACT2_LYRA_Q2,
+    "lyra_q3": ACT2_LYRA_Q3,
+    "lyra_q4": ACT2_LYRA_Q4,
+    "borin_q1": ACT2_BORIN_Q1,
+    "borin_q2": ACT2_BORIN_Q2,
+    "borin_q3": ACT2_BORIN_Q3,
+    "borin_q4": ACT2_BORIN_Q4
   };
   return map[key];
 }
@@ -56,7 +56,7 @@ function getAct3Data(ending) {
     "la_strada_diritta": ACT3_STRADADIRITTA,
     "il_compromesso": ACT3_COMPROMESSO,
     "i_due_lupi": ACT3_DUELUPI,
-    "specchio": ACT3_SPECCHIO
+    "lo_specchio": ACT3_SPECCHIO
   };
   return map[ending];
 }
@@ -88,6 +88,8 @@ const STORAGE_KEY = "trolley_school_state_v1";
 
 function getInitialState() {
   return {
+    playerName: "",
+    introSeen: false,
     day: 1,           // giorno corrente (1-30)
     cosc: 0, calc: 0, ego: 0, alt: 0,  // punteggi assi
     history: [],      // array di {day, choiceId, delta}
