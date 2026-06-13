@@ -1,4 +1,4 @@
-# Gioco Fantasi basato sulle scelte dell'utenet.
+# Gioco Fantasi basato sulle scelte dell'utente.
 
 Un viaggio narrativo di 30 giorni, dilemmi morali e finali multipli.
 
