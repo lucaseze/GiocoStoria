@@ -41,13 +41,27 @@ function renderIntro(root) {
   });
 }
 
+// Badge emoji/testo per compagno + ramo, mostrato dal giorno 11 in poi
+function getCompanionBadge(state) {
+  if (!state.companion) return '';
+  const companionEmoji = state.companion === "lyra" ? "🏹" : "🪓"; // Lyra (ranger) / Borin (nano)
+  const companionName = state.companion === "lyra" ? "Lyra" : "Borin";
+  const quadrantEmoji = {1:"🛡️", 2:"♟️", 3:"🌑", 4:"💰"};
+  const emoji = quadrantEmoji[state.quadrant] || '';
+  return `<span class="companion-badge">${companionEmoji} ${companionName} ${emoji}</span>`;
+}
+
 function render() {
   const root = document.getElementById('gameCard');
+  const topBar = document.getElementById('topBar');
 
   if (!state.introSeen) {
+    topBar.style.display = 'none';
     renderIntro(root);
     return;
   }
+
+  topBar.style.display = 'flex';
 
   if (state.completed) {
     renderFinal(root);
@@ -76,8 +90,9 @@ function render() {
   let html = '';
 
   const greeting = state.playerName ? `${state.playerName} &middot; ` : '';
+  const badge = getCompanionBadge(state);
   html += `<div class="header-row">
-    <span>${greeting}GiocoStoria</span>
+    <span>${greeting}GiocoStoria ${badge}</span>
     <span class="streak">giorno ${state.day} / 30</span>
   </div>`;
 
@@ -184,7 +199,7 @@ function renderFinal(root) {
 
   let html = `<div class="final-card">
     <div class="header-row" style="justify-content:center;">
-      <span>Trolley School &middot; Diploma</span>
+      <span>GiocoStoria &middot; Diploma ${getCompanionBadge(state)}</span>
     </div>
     <p class="final-title">${title}</p>
     <p class="final-text">${finalText}</p>
@@ -225,13 +240,7 @@ function renderFinal(root) {
 
   document.getElementById('replayBtn').addEventListener('click', () => startReplay(state));
   bindSerialCopy();
-  document.getElementById('restartBtn').addEventListener('click', () => {
-    if (confirm("Sei sicuro? Il percorso attuale andrà perso (salva il seriale prima, se vuoi tenerlo).")) {
-      state = getInitialState();
-      saveState(state);
-      render();
-    }
-  });
+  document.getElementById('restartBtn').addEventListener('click', confirmRestart);
 }
 
 // ============================================================
@@ -340,6 +349,23 @@ document.getElementById('restoreBtn').addEventListener('click', () => {
     alert("Seriale non valido. Controlla il formato (es. TS-XXXX-XXXXX) e riprova.");
   }
 });
+
+// ============================================================
+// RICOMINCIA (con conferma)
+// ============================================================
+function confirmRestart() {
+  const serial = state.history.length > 0 ? generateSerial(state) : null;
+  const msg = serial
+    ? `Sei sicuro di voler ricominciare da capo? Il percorso attuale andrà perso.\n\nIl tuo seriale attuale è:\n${serial}\n\n(copialo prima, se vuoi poterlo ripristinare in seguito)`
+    : "Sei sicuro di voler ricominciare da capo?";
+  if (confirm(msg)) {
+    state = getInitialState();
+    saveState(state);
+    render();
+  }
+}
+
+document.getElementById('restartTopBtn').addEventListener('click', confirmRestart);
 
 // ============================================================
 // AVVIO

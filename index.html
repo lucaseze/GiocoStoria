@@ -48,22 +48,22 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
-    font-size: 14px;
+    font-size: 13px;
     color: var(--text-secondary);
     font-weight: 500;
   }
   .streak { color: var(--accent); font-weight: 700; }
   .guide-text {
-    font-size: 14px;
+    font-size: 13px;
     color: var(--accent);
     font-style: italic;
     margin-bottom: 0.75rem;
-    line-height: 1.6;
+    line-height: 1.5;
     font-weight: 500;
   }
   .dilemma-text {
-    font-size: 16px;
-    line-height: 1.7;
+    font-size: 15px;
+    line-height: 1.6;
     margin: 0 0 1rem;
     color: var(--text-main);
   }
@@ -74,8 +74,8 @@
     margin-bottom: 0.75rem;
   }
   button.option-btn {
-    padding: 13px;
-    font-size: 15px;
+    padding: 12px;
+    font-size: 14px;
     border: 1px solid var(--border);
     background: var(--accent-light);
     border-radius: 10px;
@@ -84,7 +84,7 @@
     transition: background 0.15s;
     color: var(--text-main);
     font-weight: 500;
-    line-height: 1.5;
+    line-height: 1.4;
   }
   button.option-btn:hover { background: #d9e4f5; }
   button.option-btn:active { transform: scale(0.99); }
@@ -94,9 +94,9 @@
     border-radius: 10px;
     padding: 10px 12px;
     margin-bottom: 1rem;
-    font-size: 14px;
+    font-size: 13px;
     color: var(--accent);
-    line-height: 1.6;
+    line-height: 1.5;
     font-weight: 500;
   }
 
@@ -311,10 +311,42 @@
     transition: opacity 0.2s;
   }
   .copy-feedback.show { opacity: 1; }
+
+  /* Badge compagno/percorso */
+  .companion-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    background: var(--accent-light);
+    color: var(--accent);
+    padding: 3px 8px;
+    border-radius: 99px;
+    font-weight: 700;
+  }
+
+  /* Tasto ricomincia in alto */
+  .top-bar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 6px;
+  }
+  .restart-top-btn {
+    background: none;
+    border: none;
+    color: var(--text-tertiary);
+    font-size: 11px;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 2px;
+  }
 </style>
 </head>
 <body>
 <div class="wrapper">
+  <div class="top-bar" id="topBar" style="display:none;">
+    <button class="restart-top-btn" id="restartTopBtn">Ricomincia da capo</button>
+  </div>
   <div class="card-outer">
     <div class="card-inner" id="gameCard">
       <!-- popolato via JS -->
